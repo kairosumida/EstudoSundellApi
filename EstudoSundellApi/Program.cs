@@ -2,57 +2,54 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
+builder.Services.AddDbContext<SindellDb>(opt => opt.UseInMemoryDatabase("TodoList"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
 
-app.MapGet("/todoitems", async (TodoDb db) =>
-    await db.Todos.ToListAsync());
+app.MapGet("/artigos", async (SindellDb db) =>
+    await db.ArtigosSindels.ToListAsync());
 
-app.MapGet("/todoitems/complete", async (TodoDb db) =>
-    await db.Todos.Where(t => t.IsComplete).ToListAsync());
-
-app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
-    await db.Todos.FindAsync(id)
-        is Todo todo
+app.MapGet("/artigos/{id}", async (int id, SindellDb db) =>
+    await db.ArtigosSindels.FindAsync(id)
+        is ArtigoSindel todo
             ? Results.Ok(todo)
             : Results.NotFound());
-app.MapGet("/todoitems_by_page",
-    async (int pageNumber, int pageSize, TodoDb db) =>
+app.MapGet("/artigos_by_page",
+    async (int pageNumber, int pageSize, SindellDb db) =>
 
-        await db.Todos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
+        await db.ArtigosSindels.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
 
-  ).Produces<List<Todo>>(StatusCodes.Status200OK)
-  .WithName("GetTodoByPage").WithTags("Getters");
-app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
+  ).Produces<List<ArtigoSindel>>(StatusCodes.Status200OK)
+  .WithName("GetArtigosByPage").WithTags("Getters");
+app.MapPost("/artigos", async (ArtigoSindel todo, SindellDb db) =>
 {
-    db.Todos.Add(todo);
+    db.ArtigosSindels.Add(todo);
     await db.SaveChangesAsync();
 
-    return Results.Created($"/todoitems/{todo.Id}", todo);
+    return Results.Created($"/artigos/{todo.Id}", todo);
 });
 
-app.MapPut("/todoitems/{id}", async (int id, Todo inputTodo, TodoDb db) =>
+app.MapPut("/artigos/{id}", async (int id, ArtigoSindel inputTodo, SindellDb db) =>
 {
-    var todo = await db.Todos.FindAsync(id);
+    var artigo = await db.ArtigosSindels.FindAsync(id);
 
-    if (todo is null) return Results.NotFound();
+    if (artigo is null) return Results.NotFound();
 
-    todo.Name = inputTodo.Name;
-    todo.IsComplete = inputTodo.IsComplete;
-
+    artigo.Nome = inputTodo.Nome;
+    artigo.DataInicio = DateTime.Now;
+    artigo.DataTermino = inputTodo.DataTermino;
     await db.SaveChangesAsync();
 
     return Results.NoContent();
 });
 
-app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
+app.MapDelete("/artigos/{id}", async (int id, SindellDb db) =>
 {
-    if (await db.Todos.FindAsync(id) is Todo todo)
+    if (await db.ArtigosSindels.FindAsync(id) is ArtigoSindel todo)
     {
-        db.Todos.Remove(todo);
+        db.ArtigosSindels.Remove(todo);
         await db.SaveChangesAsync();
         return Results.Ok(todo);
     }
@@ -62,29 +59,21 @@ app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
 
 app.Run();
 
-public class Todo
+public class ArtigoSindel
 {
     public int Id { get; set; }
-    public string? Name { get; set; }
-    public bool IsComplete { get; set; }
-    public string? Secret { get; set; }
-}
-public class TodoItemDTO
-{
-    public int Id { get; set; }
-    public string? Name { get; set; }
-    public bool IsComplete { get; set; }
-
-    public TodoItemDTO() { }
-    public TodoItemDTO(Todo todoItem) => (Id, Name, IsComplete) = (todoItem.Id, todoItem.Name, todoItem.IsComplete);
+    public string? Nome { get; set; }
+    public DateTime DataInicio { get; set; }
+    public DateTime? DataTermino { get; set; }
 }
 
-class TodoDb : DbContext
+
+class SindellDb : DbContext
 {
-    public TodoDb(DbContextOptions<TodoDb> options)
+    public SindellDb(DbContextOptions<SindellDb> options)
         : base(options) { }
 
-    public DbSet<Todo> Todos => Set<Todo>();
+    public DbSet<ArtigoSindel> ArtigosSindels => Set<ArtigoSindel>();
 }
 public class PaginationFilter
 {
