@@ -111,3 +111,16 @@ app.MapDelete("/artigos/{id}", async (int id, SindellDb db) =>
   
 <h2>Run</h2>
 <p> Agora que está tudo definido, basda dar app.Run()</p>
+
+<h2> Paginação</h2>
+<p>É possivel criar a paginação apenas passando 2 parametros no endereço, o int pageNumber e o int pageSize</p>
+<p>Depois é só trabalhar com o BD para filtrar as informações</p>
+
+```C#
+app.MapGet("/artigos_by_page",
+    async (int pageNumber, int pageSize, SindellDb db) =>
+
+        await db.ArtigosSindels.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
+    );
+```
+
