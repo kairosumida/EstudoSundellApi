@@ -27,13 +27,13 @@ app.MapGet("/artigos_by_page",
 app.MapGet("/artigos_by_queryPage",
     async (int pageNumber, int pageSize, string query, SindellDb db) =>
     {
-
+        PaginationFilter pf = new PaginationFilter(pageNumber, pageSize);
         if (query == "nome")
         {
-            return await db.ArtigosSindels.OrderBy(x => x.Nome).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return await db.ArtigosSindels.OrderBy(x => x.Nome).Skip((pf.PageNumer - 1) * pf.PageSize).Take(pf.PageSize).ToListAsync();
 
         }
-        return await db.ArtigosSindels.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+        return await db.ArtigosSindels.Skip((pf.PageNumer - 1) * pf.PageSize).Take(pf.PageSize).ToListAsync();
 
     }
    );
