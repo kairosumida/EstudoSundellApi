@@ -111,3 +111,36 @@ app.MapDelete("/artigos/{id}", async (int id, SindellDb db) =>
   
 <h2>Run</h2>
 <p> Agora que está tudo definido, basda dar app.Run()</p>
+
+<h2> Paginação</h2>
+<p>É possivel criar a paginação apenas passando 2 parametros no endereço, o int pageNumber e o int pageSize</p>
+<p>Depois é só trabalhar com o BD para filtrar as informações</p>
+
+```C#
+app.MapGet("/artigos_by_page",
+    async (int pageNumber, int pageSize, SindellDb db) =>
+
+        await db.ArtigosSindels.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
+    );
+```
+
+<p>Note que usei um nome diferente artigos_by_page, por algum motivo quando usado o artigos ele não funciona</p>
+
+<h2> Paginação com Query</h2>
+<p>Talvez não seja a melhor solução, mas o que eu descobri foi que, como podemos passar parâmetros dentro do endereço. Podemos enviar uma variavel string. Por exemplo: query=nome. Meu filtro irá ordenar por nome. E então retornar uma lista ordenada. Então depois coloco uma paginação.</p>
+
+```C#
+app.MapGet("/artigos_by_queryPage",
+    async (int pageNumber, int pageSize, string query, SindellDb db) =>
+    {
+
+        if (query == "nome")
+        {
+            return await db.ArtigosSindels.OrderBy(x => x.Nome).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+        }
+        return await db.ArtigosSindels.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+    }
+   );
+```
