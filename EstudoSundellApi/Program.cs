@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿//https://localhost:7017/todoitems?pageNumber=1&pageSize=1
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
@@ -18,7 +19,13 @@ app.MapGet("/todoitems/{id}", async (int id, TodoDb db) =>
         is Todo todo
             ? Results.Ok(todo)
             : Results.NotFound());
+app.MapGet("/todoitems_by_page",
+    async (int pageNumber, int pageSize, TodoDb db) =>
 
+        await db.Todos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
+
+  ).Produces<List<Todo>>(StatusCodes.Status200OK)
+  .WithName("GetTodoByPage").WithTags("Getters");
 app.MapPost("/todoitems", async (Todo todo, TodoDb db) =>
 {
     db.Todos.Add(todo);
@@ -55,12 +62,21 @@ app.MapDelete("/todoitems/{id}", async (int id, TodoDb db) =>
 
 app.Run();
 
-class Todo
+public class Todo
 {
     public int Id { get; set; }
     public string? Name { get; set; }
     public bool IsComplete { get; set; }
     public string? Secret { get; set; }
+}
+public class TodoItemDTO
+{
+    public int Id { get; set; }
+    public string? Name { get; set; }
+    public bool IsComplete { get; set; }
+
+    public TodoItemDTO() { }
+    public TodoItemDTO(Todo todoItem) => (Id, Name, IsComplete) = (todoItem.Id, todoItem.Name, todoItem.IsComplete);
 }
 
 class TodoDb : DbContext
@@ -69,4 +85,19 @@ class TodoDb : DbContext
         : base(options) { }
 
     public DbSet<Todo> Todos => Set<Todo>();
+}
+public class PaginationFilter
+{
+    public int PageNumer { get; set; }
+    public int PageSize { get; set; }
+    public PaginationFilter()
+    {
+        this.PageNumer = 1;
+        this.PageSize = 10;
+    }
+    public PaginationFilter(int pageNumber, int pageSize)
+    {
+        this.PageNumer = pageNumber < 1 ? 1 : pageNumber;
+        this.PageSize = pageSize > 10 ? 10 : pageSize;
+    }
 }
