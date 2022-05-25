@@ -1,4 +1,4 @@
-﻿//https://localhost:7017/todoitems?pageNumber=1&pageSize=1
+﻿//https://localhost:7017/artigos_by_page?pageNumber=2&pageSize=3
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,13 +16,12 @@ app.MapGet("/artigos/{id}", async (int id, SindellDb db) =>
         is ArtigoSindel todo
             ? Results.Ok(todo)
             : Results.NotFound());
-app.MapGet("/artigos_by_page",
+app.MapGet("/artigos",
     async (int pageNumber, int pageSize, SindellDb db) =>
 
         await db.ArtigosSindels.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync()
-
-  ).Produces<List<ArtigoSindel>>(StatusCodes.Status200OK)
-  .WithName("GetArtigosByPage").WithTags("Getters");
+  );
+  
 app.MapPost("/artigos", async (ArtigoSindel todo, SindellDb db) =>
 {
     db.ArtigosSindels.Add(todo);
