@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<SindellDb>(opt => opt.UseCosmos(ConfigurationDBCosmo.PrimaryConnectionString, ConfigurationDBCosmo.PrimaryKey, ConfigurationDBCosmo.DatabaseName));
+builder.Services.AddDbContext<SindellDb>(options => options.UseCosmos(ConfigurationDBCosmo.URI, ConfigurationDBCosmo.PrimaryKey, ConfigurationDBCosmo.DatabaseName));
 
+builder.Services.AddEndpointsApiExplorer();
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
@@ -79,20 +80,15 @@ public class ArtigoSindel
     public int Id { get; set; }
     public string? Nome { get; set; }
     public DateTime DataInicio { get; set; }
-    public DateTime? DataTermino { get; set; }
+    public DateTime DataTermino { get; set; }
 }
 
 
 class SindellDb : DbContext
 {
-    public DbSet<ArtigoSindel> ArtigosSindels { get; set; }
-    protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder) =>
-        optionBuilder.UseCosmos(ConfigurationDBCosmo.URI, ConfigurationDBCosmo.PrimaryKey, ConfigurationDBCosmo.DatabaseName);
     
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<ArtigoSindel>(x => { x.ToContainer("artigossindell"); });
-    }
+    public SindellDb(DbContextOptions options) : base(options) { }
+    public DbSet<ArtigoSindel> ArtigosSindels { get; set; }
 }
 public class PaginationFilter
 {
