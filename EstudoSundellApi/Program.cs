@@ -2,8 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<SindellDb>(opt => opt.UseInMemoryDatabase("TodoList"));
-builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+builder.Services.AddDbContext<SindellDb>(opt => opt.UseCosmos(ConfigurationDBCosmo.PrimaryConnectionString, ConfigurationDBCosmo.PrimaryKey, ConfigurationDBCosmo.DatabaseName));
+
 var app = builder.Build();
 
 app.MapGet("/", () => "Hello World!");
@@ -85,10 +85,14 @@ public class ArtigoSindel
 
 class SindellDb : DbContext
 {
-    public SindellDb(DbContextOptions<SindellDb> options)
-        : base(options) { }
-
-    public DbSet<ArtigoSindel> ArtigosSindels => Set<ArtigoSindel>();
+    public DbSet<ArtigoSindel> ArtigosSindels { get; set; }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionBuilder) =>
+        optionBuilder.UseCosmos(ConfigurationDBCosmo.URI, ConfigurationDBCosmo.PrimaryKey, ConfigurationDBCosmo.DatabaseName);
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ArtigoSindel>(x => { x.ToContainer("artigossindell"); });
+    }
 }
 public class PaginationFilter
 {
@@ -104,4 +108,13 @@ public class PaginationFilter
         this.PageNumer = pageNumber < 1 ? 1 : pageNumber;
         this.PageSize = pageSize > 10 ? 10 : pageSize;
     }
+    
+}
+public static class ConfigurationDBCosmo
+{
+    public const string DatabaseName = "DatabaseCosmo";
+    public const string URI = "https://kairoswift.documents.azure.com:443/";
+    public const string PrimaryKey = "tWfyWR2STBOY1fLmCtsEv2WfR3qk82f5EdKsBmFN8KknI9vWjfVVuqPy9D7jLEVpFaimjTyaEHWKOxisrrGQ2w==";
+    public const string PrimaryConnectionString = "AccountEndpoint=https://kairoswift.documents.azure.com:443/;AccountKey=tWfyWR2STBOY1fLmCtsEv2WfR3qk82f5EdKsBmFN8KknI9vWjfVVuqPy9D7jLEVpFaimjTyaEHWKOxisrrGQ2w==";
+    
 }
