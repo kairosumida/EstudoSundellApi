@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 25.0.1700.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EstudoSundellApi", "EstudoSundellApi\EstudoSundellApi.csproj", "{80C7B93C-DE40-4EB3-8038-134EE639E789}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EstudoSundellApi", "EstudoSundellApi\EstudoSundellApi.csproj", "{733B0C91-03CB-4830-BF6B-7634375CCED3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{80C7B93C-DE40-4EB3-8038-134EE639E789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80C7B93C-DE40-4EB3-8038-134EE639E789}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80C7B93C-DE40-4EB3-8038-134EE639E789}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80C7B93C-DE40-4EB3-8038-134EE639E789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{733B0C91-03CB-4830-BF6B-7634375CCED3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{733B0C91-03CB-4830-BF6B-7634375CCED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{733B0C91-03CB-4830-BF6B-7634375CCED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{733B0C91-03CB-4830-BF6B-7634375CCED3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {76D27931-D9FB-4B05-9CE2-485F33DCBE6A}
+		SolutionGuid = {32C8AF9C-F7D1-44DD-9F43-121EC008831D}
 	EndGlobalSection
 EndGlobal
