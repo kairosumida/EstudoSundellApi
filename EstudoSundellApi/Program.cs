@@ -7,8 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext<SindellDb>();
+builder.Services.AddDbContext<SindellDbContext>();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -25,18 +26,21 @@ app.UseHttpsRedirection();
 
 
 
-app.MapGet("/artigos", async (SindellDb db) =>
+app.MapGet("/artigos", async (SindellDbContext db) =>
+
     await db.ArtigosSindels.ToListAsync());
 
-app.MapPost("/artigos", async (ArtigoSindel todo, SindellDb db) =>
+app.MapPost("/artigos", async (ArtigoSindel todo, SindellDbContext db) =>
 {
+    
     db.ArtigosSindels.Add(todo);
     await db.SaveChangesAsync();
+    
 
     return Results.Created($"/artigos/{todo.Id}", todo);
 });
 
-app.MapPut("/artigos/{id}", async (int id, ArtigoSindel inputTodo, SindellDb db) =>
+app.MapPut("/artigos/{id}", async (int id, ArtigoSindel inputTodo, SindellDbContext db) =>
 {
     var artigo = await db.ArtigosSindels.FindAsync(id);
 
@@ -49,7 +53,7 @@ app.MapPut("/artigos/{id}", async (int id, ArtigoSindel inputTodo, SindellDb db)
 
     return Results.NoContent();
 });
-app.MapDelete("/artigos/{id}", async (int id, SindellDb db) =>
+app.MapDelete("/artigos/{id}", async (int id, SindellDbContext db) =>
 {
     if (await db.ArtigosSindels.FindAsync(id) is ArtigoSindel todo)
     {
@@ -74,7 +78,7 @@ public class ArtigoSindel
 }
 
 
-class SindellDb : DbContext
+class SindellDbContext : DbContext
 {
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     => optionsBuilder.UseCosmos(
@@ -82,7 +86,7 @@ class SindellDb : DbContext
         ConfigurationDBCosmo.PrimaryKey,
         ConfigurationDBCosmo.DatabaseName);
 
-    public SindellDb(DbContextOptions options) : base(options) { }
+    public SindellDbContext(DbContextOptions options) : base(options) { }
     public DbSet<ArtigoSindel> ArtigosSindels { get; set; }
 }
 public class PaginationFilter
