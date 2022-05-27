@@ -80,7 +80,7 @@ public class ArtigoSindel
     public int Id { get; set; }
     public string? Nome { get; set; }
     public DateTime DataInicio { get; set; }
-    public DateTime DataTermino { get; set; }
+    public DateTime? DataTermino { get; set; }
 }
 
 
@@ -89,6 +89,10 @@ class SindellDb : DbContext
     
     public SindellDb(DbContextOptions options) : base(options) { }
     public DbSet<ArtigoSindel> ArtigosSindels { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        
+    }
 }
 public class PaginationFilter
 {
