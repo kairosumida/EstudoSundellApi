@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
-﻿using Microsoft.EntityFrameworkCore;
-=======
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+
 using Microsoft.EntityFrameworkCore;
->>>>>>> Stashed changes
 using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,19 +8,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
 
-<<<<<<< Updated upstream
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<SindellDbContext>();
-=======
+
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddDbContext<SindellDbContext>(opt => opt.UseCosmos(
-        ConfigurationDBCosmo.URI,
-        ConfigurationDBCosmo.PrimaryKey,
-        ConfigurationDBCosmo.DatabaseName));
 
->>>>>>> Stashed changes
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -88,32 +77,24 @@ public class ArtigoSindel
 {
     [JsonProperty(PropertyName = "id")]
     public int Id { get; set; }
-<<<<<<< Updated upstream
-    public string? Nome { get; set; }
-    public DateTime DataInicio { get; set; }
-=======
     [JsonProperty(PropertyName = "nome")]
     public string? Nome { get; set; }
     [JsonProperty(PropertyName = "dataInicio")]
     public DateTime DataInicio { get; set; }
     [JsonProperty(PropertyName = "dataTermino")]
->>>>>>> Stashed changes
     public DateTime? DataTermino { get; set; }
 }
 
 
 class SindellDbContext : DbContext
 {
-<<<<<<< Updated upstream
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     => optionsBuilder.UseCosmos(
         ConfigurationDBCosmo.URI,
         ConfigurationDBCosmo.PrimaryKey,
         ConfigurationDBCosmo.DatabaseName);
 
-    public SindellDbContext(DbContextOptions options) : base(options) { }
-    public DbSet<ArtigoSindel> ArtigosSindels { get; set; }
-=======
     public SindellDbContext(DbContextOptions<SindellDbContext> options) : base(options) { }
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -126,7 +107,7 @@ class SindellDbContext : DbContext
     }
 
     public DbSet<ArtigoSindel> ArtigosSindels => Set<ArtigoSindel>();
->>>>>>> Stashed changes
+
 }
 public class PaginationFilter
 {
@@ -146,11 +127,7 @@ public class PaginationFilter
 }
 public static class ConfigurationDBCosmo
 {
-<<<<<<< Updated upstream
     public const string DatabaseName = "SindellDb";
-=======
-    public const string DatabaseName = "ToDoList";
->>>>>>> Stashed changes
     public const string URI = "https://kairoswift.documents.azure.com:443/";
     public const string PrimaryKey = "tWfyWR2STBOY1fLmCtsEv2WfR3qk82f5EdKsBmFN8KknI9vWjfVVuqPy9D7jLEVpFaimjTyaEHWKOxisrrGQ2w==";
     public const string PrimaryConnectionString = "AccountEndpoint=https://kairoswift.documents.azure.com:443/;AccountKey=tWfyWR2STBOY1fLmCtsEv2WfR3qk82f5EdKsBmFN8KknI9vWjfVVuqPy9D7jLEVpFaimjTyaEHWKOxisrrGQ2w==";
