@@ -1,4 +1,7 @@
 
+using EstudoSundellApi.Data;
+using EstudoSundellApi.Models;
+using Microsoft.Azure.Cosmos;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -10,11 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext<SindellDbContext>();
-
+builder.Services.AddDbContext<SindellContext>();
 builder.Services.AddEndpointsApiExplorer();
-
-
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -30,39 +30,61 @@ app.UseHttpsRedirection();
 
 
 
+app.MapGet("/artigos", async (SindellContext db) =>
 
-app.MapGet("/artigos", async (SindellDbContext db) =>
+    await db.Families.ToListAsync());
 
-    await db.ArtigosSindels.ToListAsync());
-
-app.MapPost("/artigos", async (ArtigoSindel todo, SindellDbContext db) =>
+app.MapPost("/artigos", async (Family todo, SindellContext db) =>
 {
-    
-    db.ArtigosSindels.Add(todo);
+    todo = new Family
+    {
+        Id = "Andersen.3",
+        PartitionKey = "Andersen",
+        LastName = "Andersen",
+        Parents = new List<Parent>()
+                {
+                    new Parent { FirstName = "Thomas" },
+                    new Parent { FirstName = "Mary Kay" }
+                },
+        Children = new List<Child>()
+                {
+                    new Child
+                    {
+                        FirstName = "Henriette Thaulow",
+                        Gender = "female",
+                        Grade = 5,
+                        Pets = new List<Pet>()
+                        {
+                            new Pet { GivenName = "Fluffy" }
+                        }
+                    }
+                },
+        Address = new Address { State = "WA", County = "King", City = "Seattle" },
+        IsRegistered = false
+    };
+    db.Families.Add(todo);
     await db.SaveChangesAsync();
     
 
     return Results.Created($"/artigos/{todo.Id}", todo);
 });
 
-app.MapPut("/artigos/{id}", async (int id, ArtigoSindel inputTodo, SindellDbContext db) =>
+app.MapPut("/artigos/{id}", async (int id, Family inputTodo, SindellContext db) =>
 {
-    var artigo = await db.ArtigosSindels.FindAsync(id);
+    var artigo = await db.Families.FindAsync(id);
 
     if (artigo is null) return Results.NotFound();
 
-    artigo.Nome = inputTodo.Nome;
-    artigo.DataInicio = DateTime.Now;
-    artigo.DataTermino = inputTodo.DataTermino;
+    
     await db.SaveChangesAsync();
 
     return Results.NoContent();
 });
-app.MapDelete("/artigos/{id}", async (int id, SindellDbContext db) =>
+app.MapDelete("/artigos/{id}", async (int id, SindellContext db) =>
 {
-    if (await db.ArtigosSindels.FindAsync(id) is ArtigoSindel todo)
+    if (await db.Families.FindAsync(id) is Family todo)
     {
-        db.ArtigosSindels.Remove(todo);
+        db.Families.Remove(todo);
         await db.SaveChangesAsync();
         return Results.Ok(todo);
     }
@@ -72,64 +94,3 @@ app.MapDelete("/artigos/{id}", async (int id, SindellDbContext db) =>
 
 app.Run();
 
-
-public class ArtigoSindel
-{
-    [JsonProperty(PropertyName = "id")]
-    public int Id { get; set; }
-    [JsonProperty(PropertyName = "nome")]
-    public string? Nome { get; set; }
-    [JsonProperty(PropertyName = "dataInicio")]
-    public DateTime DataInicio { get; set; }
-    [JsonProperty(PropertyName = "dataTermino")]
-    public DateTime? DataTermino { get; set; }
-}
-
-
-class SindellDbContext : DbContext
-{
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    => optionsBuilder.UseCosmos(
-        ConfigurationDBCosmo.URI,
-        ConfigurationDBCosmo.PrimaryKey,
-        ConfigurationDBCosmo.DatabaseName);
-
-    public SindellDbContext(DbContextOptions<SindellDbContext> options) : base(options) { }
-
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder
-     .Entity<ArtigoSindel>().ToContainer("Items")
-     .Property(e => e.Id)
-     .ValueGeneratedOnAdd();
-        
-    }
-
-    public DbSet<ArtigoSindel> ArtigosSindels => Set<ArtigoSindel>();
-
-}
-public class PaginationFilter
-{
-    public int PageNumer { get; set; }
-    public int PageSize { get; set; }
-    public PaginationFilter()
-    {
-        this.PageNumer = 1;
-        this.PageSize = 10;
-    }
-    public PaginationFilter(int pageNumber, int pageSize)
-    {
-        this.PageNumer = pageNumber < 1 ? 1 : pageNumber;
-        this.PageSize = pageSize > 10 ? 10 : pageSize;
-    }
-
-}
-public static class ConfigurationDBCosmo
-{
-    public const string DatabaseName = "SindellDb";
-    public const string URI = "https://kairoswift.documents.azure.com:443/";
-    public const string PrimaryKey = "tWfyWR2STBOY1fLmCtsEv2WfR3qk82f5EdKsBmFN8KknI9vWjfVVuqPy9D7jLEVpFaimjTyaEHWKOxisrrGQ2w==";
-    public const string PrimaryConnectionString = "AccountEndpoint=https://kairoswift.documents.azure.com:443/;AccountKey=tWfyWR2STBOY1fLmCtsEv2WfR3qk82f5EdKsBmFN8KknI9vWjfVVuqPy9D7jLEVpFaimjTyaEHWKOxisrrGQ2w==";
-
-}
